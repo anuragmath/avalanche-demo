@@ -42,10 +42,15 @@ export class Slush<T extends UserContext<C>, C> implements NodePolicy<T, C, Slus
     }
 
     async tick(userContext: T, network: Network<T, C, Slush<T, C>, SlushBuilder<T, C>>): Promise<void> {
-        if (!this.color) return;
+
+        if (!this.color){
+          return;
+        }
 
         let sample = network.randomlySampleNodes(userContext.sampleSize);
+
         let queryResult = await Promise.all(sample.map(node => {
+            //creates slush request with current color of the slush
             let req = new SlushRequest<C>(this.color);
             node.policy.requestQueue.push(req);
             return req.getPromise();
@@ -68,6 +73,7 @@ export class Slush<T extends UserContext<C>, C> implements NodePolicy<T, C, Slus
 }
 
 export class SlushBuilder<T extends UserContext<C>, C> implements NodePolicyBuilder<T, C, Slush<T, C>, SlushBuilder<T, C>> {
+
     buildPolicy(): Slush<T, C> {
         return new Slush();
     }

@@ -54,10 +54,9 @@ export class Network<T extends UserContext<C>, C, P extends NodePolicy<T, C, P, 
     }
 
     tick() {
-        // Simulate async network.
+
         for (let node of this.nodes) {
             let currentQueueLen = node.policy.requestQueue.length;
-
             for (let req of node.policy.requestQueue) {
                 node.shuffledRequestQueue.push(req);
             }
@@ -65,16 +64,20 @@ export class Network<T extends UserContext<C>, C, P extends NodePolicy<T, C, P, 
             shuffleInPlace(node.shuffledRequestQueue);
 
             let k = Math.floor(currentQueueLen * 2 * Math.random());
+
             if (k < 100) k = 100;
             if (k > node.shuffledRequestQueue.length) k = node.shuffledRequestQueue.length;
 
             node.policy.requestQueue = node.shuffledRequestQueue.splice(0, k);
             node.policy.query(node.config.userContext);
+
         }
 
         for (let node of this.nodes) {
+            console.log(node.policy);
             node.policy.tick(node.config.userContext, this);
         }
+
     }
 }
 
